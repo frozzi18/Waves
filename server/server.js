@@ -15,6 +15,13 @@ app.use(cookiesParser());
 
 const { User } = require('./models/user')
 
+const {auth} = require('./middleware/auth')
+
+// Middleware
+app.get('/api/users/cart', auth, (req,res)=>{
+
+})
+
 /////////////////////////////////
 /// USERS
 /////////////////////////////////
