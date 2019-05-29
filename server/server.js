@@ -13,18 +13,51 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookiesParser());
 
+// Models
 const { User } = require('./models/user')
+const { Brand } = require('./models/brand')
 
+// Middleware
 const {auth} = require('./middleware/auth')
 
 // Middleware
-app.get('/api/users/cart', auth, (req,res)=>{
+app.get('/api/users/auth', auth, (req,res)=>{
+    
+    res.status(200).json({
+       isAdmin: req.user.role == 0? false : true,
+       isAuth : true,
+       email:req.user.emal,
+       name : req.user.name,
+       lastname : req.user.lastname,
+       role : req.user.role,
+       cart : req.user.cart,
+       history : req.user.history
 
+    })
+
+}) 
+
+
+// =============================
+/// BRAND
+// =============================
+
+
+app.post('/api/product/brand', auth, (req, res)=>{
+    const brand = new Brand(req.body)
+
+    brand.save((err, doc)=>{
+        if(err) return res.json({success:false, err})
+        res.status(200).json({
+            success:true,
+            brand:doc
+        })
+    })
 })
 
-/////////////////////////////////
+// =============================
 /// USERS
-/////////////////////////////////
+// =============================
 
 app.post('/api/users/register', (req,res)=>{
     const user = new User(req.body);
@@ -55,6 +88,20 @@ app.post('/api/users/login', (req,res)=>{
 
         })
     })
+})
+
+app.get('/api/users/logout', auth, (req, res)=>{
+
+    User.findByIdAndUpdate( 
+        {_id : req.user._id},
+        {token :'' },
+        (err, doc)=>{
+            if(err) return res.json({success: false, err});
+            return res.status(200).json({
+                success: true
+            }) 
+        }
+    )
 })
 
 const port = process.env.PORT || 3002;
