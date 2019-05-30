@@ -18,7 +18,8 @@ const { User } = require('./models/user')
 const { Brand } = require('./models/brand')
 
 // Middleware
-const {auth} = require('./middleware/auth')
+const { auth } = require('./middleware/auth')
+const { admin } = require('./middleware/admin')
 
 // Middleware
 app.get('/api/users/auth', auth, (req,res)=>{
@@ -43,7 +44,7 @@ app.get('/api/users/auth', auth, (req,res)=>{
 // =============================
 
 
-app.post('/api/product/brand', auth, (req, res)=>{
+app.post('/api/product/brand', auth, admin, (req, res)=>{
     const brand = new Brand(req.body)
 
     brand.save((err, doc)=>{
